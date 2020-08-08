@@ -3,6 +3,9 @@
 *	Date:	2012-06-24
 *	Ver:	1.0
 */
+/* field chess
+* this code will be modifed to field chess 
+*/
 
 var gameimg = ['images/a1.gif','images/a2.gif','images/a3.gif','images/a4.gif','images/a5.gif','images/a6.gif','images/a7.gif','images/b1.gif','images/b2.gif','images/b3.gif','images/b4.gif','images/b5.gif','images/b6.gif','images/b7.gif','images/bg.gif','images/bg_over.gif','images/bg_sel.gif'];
 var chess_obj = new ChessClass();
