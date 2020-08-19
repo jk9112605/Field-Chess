@@ -26,12 +26,11 @@ function ChessClass() {
     this.boardrows = 4;
     this.boardcols = 8;
     this.area = 82;
-    this.player = 1;
-    // 1:red 2:green
-    this.selected = null;
-    // selected chess
-    this.chesstype = ['', 'a', 'b'];
+    this.player = 1; // 1:red 2:green
+    this.selected = null; // selected chess
+    this.chesstype = ['', 'a', 'b']; //use this.player to indicate current player. if this.player==1, then current chesstype[1] is 'a'
     this.isover = 0;
+    this.firstMove = 1; //firstMove==1 means first player is not define yet. if firstMove==0, assign current player to this player.
 }
 
 // init
@@ -40,13 +39,17 @@ ChessClass.prototype.init = function() {
     this.create_board();
     this.create_chess();
     this.showAll();
+    this.resetPlayer();
     this.create_event();
     this.player = 1;
     this.selected = null;
     this.isover = 0;
     disp('init_div', 'hide');
 }
-
+ChessClass.prototype.resetPlayer = function() {
+        $('grade_img1').className = 'img';
+        $('grade_img2').className = 'img';
+}
 // create board and fill chess background
 ChessClass.prototype.create_board = function() {
     var board = '';
@@ -160,14 +163,13 @@ ChessClass.prototype.action = function(o) {
 
     var index = this.getindex(o.id);
 
-    if (this.selected == null) {
-        // 未选过棋子
+    if (this.selected == null) {        // 未選過棋子
         if (this.chess[index]['status'] == 0) {
             // not opened
             this.show(index);
         } else if (this.chess[index]['status'] == 1) {
-            // opened
-            if (this.chess[index]['type'] == this.chesstype[this.player]) {
+            // opened, check is this chess belong the current player. will modify it to field chess.
+            if (this.chess[index]['type'] == this.chesstype[this.player] || this.firstMove==1) {
                 this.select(index);
             }
         }
@@ -190,6 +192,11 @@ ChessClass.prototype.action = function(o) {
                 }
             }
         }
+        else if(this.firstMove==1){ //selected the same chess, if firstMove==1, can cancel this selection
+            //this.className = '';
+            $(this.getid(this.selected['index'])).className = '';
+            this.selected=null;
+        } 
     }
 }
 
@@ -217,6 +224,7 @@ ChessClass.prototype.select = function(index) {
         'chess': this.chess[index]
     };
     $(this.getid(index)).className = 'onsel';
+    this.player=this.chess[index]['type']=='a'? 1:2;
 }
 
 // move chess
