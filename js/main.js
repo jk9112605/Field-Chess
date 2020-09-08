@@ -163,7 +163,8 @@ ChessClass.prototype.action = function(o) {
 
     var index = this.getindex(o.id);
 
-    if (this.selected == null) {        // 未選過棋子
+    // 未選過棋子
+    if (this.selected == null) {
         if (this.chess[index]['status'] == 0) {
             // not opened
             this.show(index);
@@ -229,7 +230,7 @@ ChessClass.prototype.select = function(index) {
 
 // move chess
 ChessClass.prototype.move = function(index) {
-    if (this.beside(index)) {
+    if (this.isMovementLegal(index)) {
         this.chess[index] = {
             'chess': this.selected['chess']['chess'],
             'type': this.selected['chess']['type'],
@@ -238,12 +239,16 @@ ChessClass.prototype.move = function(index) {
         };
         this.remove(this.selected['index']);
         this.show(index);
+        this.firstMove=0; //remove firstMove
     }
 }
 
 // kill chess
 ChessClass.prototype.kill = function(index) {
-    if (this.beside(index) == true && this.can_kill(index) == true) {
+    
+    
+    
+    if (this.isKillMovementLegal(index) == true && this.can_kill(index) == true) {
         this.chess[index] = {
             'chess': this.selected['chess']['chess'],
             'type': this.selected['chess']['type'],
@@ -254,6 +259,7 @@ ChessClass.prototype.kill = function(index) {
         var killed = this.player == 1 ? 2 : 1;
         $('grade_num' + killed).innerHTML = parseInt($('grade_num' + killed).innerHTML) - 1;
         this.show(index);
+        this.firstMove=0;
     }
 }
 
@@ -269,7 +275,7 @@ ChessClass.prototype.remove = function(index) {
 * @param index		目標棋子index
 * @param selindex	执行的棋子index，可为空, 为空则读取选中的棋子
 */
-ChessClass.prototype.beside = function(index, selindex) {
+ChessClass.prototype.isMovementLegal = function(index, selindex) {
     if (typeof (selindex) == 'undefined') {
         if (this.selected != null) {
             selindex = this.selected['index'];
@@ -281,20 +287,79 @@ ChessClass.prototype.beside = function(index, selindex) {
     if (typeof (this.chess[index]) == 'undefined') {
         return false;
     }
-
+    
     var from_info = this.getid(selindex).split('_');
     var to_info = this.getid(index).split('_');
-    var fw = parseInt(from_info[0]);
-    var fc = parseInt(from_info[1]);
-    var tw = parseInt(to_info[0]);
-    var tc = parseInt(to_info[1]);
-
-    if (fw == tw && Math.abs(fc - tc) == 1 || fc == tc && Math.abs(fw - tw) == 1) {
+    var fromRow = parseInt(from_info[0]);
+    var fromColumn = parseInt(from_info[1]);
+    var toRow = parseInt(to_info[0]);
+    var toColumn = parseInt(to_info[1]);
+    var rowVector = toRow-fromRow;
+    var colVector= toColumn-fromColumn;
+    
+    switch(parseInt(this.chess[selindex]['val'])){
+        case 1: //Generals
+        case 2: //Advisor
+        case 3: //Elephant
+        case 4: //Chariot
+        case 5: //Horse
+            return this.checkHorseMovement(rowVector,colVector); 
+            break;
+        case 6: //Cannon
+        case 7: //Soldier
+    }
+    
+    if (fromRow == toRow && Math.abs(fromColumn - toColumn) == 1 || fromColumn == toColumn && Math.abs(fromRow - toRow) == 1) {
         // row or colunm is same and interval=1
         return true;
     } else {
         return false;
     }
+}
+ChessClass.prototype.isKillMovementLegal = function(index, selindex) {
+    if (typeof (selindex) == 'undefined') {
+        if (this.selected != null) {
+            selindex = this.selected['index'];
+        } else {
+            return false;
+        }
+    }
+
+    if (typeof (this.chess[index]) == 'undefined') {
+        return false;
+    }
+    
+    var from_info = this.getid(selindex).split('_');
+    var to_info = this.getid(index).split('_');
+    var fromRow = parseInt(from_info[0]);
+    var fromColumn = parseInt(from_info[1]);
+    var toRow = parseInt(to_info[0]);
+    var toColumn = parseInt(to_info[1]);
+    var rowVector = toRow-fromRow;
+    var colVector= toColumn-fromColumn;
+    
+    switch(parseInt(this.chess[selindex]['val'])){
+        case 1: //Generals
+        case 2: //Advisor
+        case 3: //Elephant
+        case 4: //Chariot
+        case 5: //Horse
+            return this.checkHorseMovement(rowVector,colVector); 
+            break;
+        case 6: //Cannon
+        case 7: //Soldier
+    }
+    
+    if (fromRow == toRow && Math.abs(fromColumn - toColumn) == 1 || fromColumn == toColumn && Math.abs(fromRow - toRow) == 1) {
+        // row or colunm is same and interval=1
+        return true;
+    } else {
+        return false;
+    }
+}
+ChessClass.prototype.checkHorseMovement=function(rowVector, colVector){
+    if(Math.abs(rowVector)==1 && Math.abs(colVector)==1) return true;
+    else return false;
 }
 
 /* check can kill
@@ -302,6 +367,7 @@ ChessClass.prototype.beside = function(index, selindex) {
 * @param selindex	执行消灭的棋子index，可为空, 为空则读取选中的棋子
 */
 ChessClass.prototype.can_kill = function(index, selindex) {
+    //define 
     if (typeof (selindex) == 'undefined') {
         // 没有指定执行消灭的棋子
         if (this.selected != null) {
@@ -311,6 +377,21 @@ ChessClass.prototype.can_kill = function(index, selindex) {
             return false;
         }
     }
+
+    //todo check the type of chess
+    switch (parseInt(this.chess[selindex]['val'])) {
+        case 1: //Generals
+        case 2: //Advisor
+        case 3: //Elephant
+        case 4: //Chariot
+        case 5: //Horse
+
+            break;
+        case 6: //Cannon
+        case 7: //Soldier
+    }
+    
+    
     if (this.chess[index]['type'] != this.chesstype[this.player]) {
         if (parseInt(this.chess[selindex]['val']) == 7 && parseInt(this.chess[index]['val']) == 1) {
             // 7 can kill 1
@@ -399,19 +480,19 @@ ChessClass.prototype.can_action = function() {
         } else {
             if (chess[i].status == 1 && chess[i].type == this.chesstype[this.player]) {
                 // 己方已翻开的棋子
-                if (this.beside(i - this.boardcols, i) && (chess[i - this.boardcols].status == -1 || this.can_kill(i - this.boardcols, i))) {
+                if (this.isMovementLegal(i - this.boardcols, i) && (chess[i - this.boardcols].status == -1 || this.can_kill(i - this.boardcols, i))) {
                     // 上
                     return true;
                 }
-                if (this.beside(i + this.boardcols, i) && (chess[i + this.boardcols].status == -1 || this.can_kill(i + this.boardcols, i))) {
+                if (this.isMovementLegal(i + this.boardcols, i) && (chess[i + this.boardcols].status == -1 || this.can_kill(i + this.boardcols, i))) {
                     // 下
                     return true;
                 }
-                if (this.beside(i - 1, i) && (chess[i - 1].status == -1 || this.can_kill(i - 1, i))) {
+                if (this.isMovementLegal(i - 1, i) && (chess[i - 1].status == -1 || this.can_kill(i - 1, i))) {
                     // 左
                     return true;
                 }
-                if (this.beside(i + 1, i) && (chess[i + 1].status == -1 || this.can_kill(i + 1, i))) {
+                if (this.isMovementLegal(i + 1, i) && (chess[i + 1].status == -1 || this.can_kill(i + 1, i))) {
                     // 右
                     return true;
                 }
