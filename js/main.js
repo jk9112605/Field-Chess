@@ -21,7 +21,7 @@ window.onload = function() {
 }
 
 // chess class
-function ChessClass() {
+function ChessClass() { //in javascript, function is an object
     this.chess = [];
     this.boardrows = 4;
     this.boardcols = 8;
@@ -138,7 +138,7 @@ ChessClass.prototype.create_event = function() {
         }
         chess_area[i].onclick = function() {
             // onclick
-            self.action(this);
+            self.onClick(this);
         }
     }
 }
@@ -154,8 +154,8 @@ ChessClass.prototype.getid = function(index) {
     return parseInt(index / this.boardcols) + '_' + parseInt(index % this.boardcols);
 }
 
-// action
-ChessClass.prototype.action = function(o) {
+// action 點選棋子 查看動作
+ChessClass.prototype.onClick = function(o) {
     if (this.isover == 1) {
         // game over
         return false;
@@ -227,8 +227,8 @@ ChessClass.prototype.select = function(index) {
     $(this.getid(index)).className = 'onsel';
     this.player=this.chess[index]['type']=='a'? 1:2;
 }
-
-// move chess
+//code here
+// move chess 只單純移動棋子，不吃子
 ChessClass.prototype.move = function(index) {
     if (this.isMovementLegal(index)) {
         this.chess[index] = {
@@ -242,8 +242,8 @@ ChessClass.prototype.move = function(index) {
         this.firstMove=0; //remove firstMove
     }
 }
-
-// kill chess
+// code here
+// kill chess 已點到敵方棋子，檢查是否可吃子
 ChessClass.prototype.kill = function(index) {
     
     
@@ -439,7 +439,7 @@ ChessClass.prototype.gameover = function() {
         this.show_grade();
         disp('init_div', 'show');
     } else {
-        if (this.can_action() == false) {
+        if (this.isAnyChessCanAction() == false) {
             this.isover = 1;
             this.show_grade();
             disp('init_div', 'show');
@@ -471,7 +471,7 @@ ChessClass.prototype.show_grade = function() {
 }
 
 // check chess can action
-ChessClass.prototype.can_action = function() {
+ChessClass.prototype.isAnyChessCanAction = function() {
     var chess = this.chess;
     for (var i = 0, max = chess.length; i < max; i++) {
         if (chess[i].status == 0) {
@@ -557,3 +557,5 @@ function img_preload(img, callback) {
         }
     }, 200);
 }
+
+console.log(chess_obj);
