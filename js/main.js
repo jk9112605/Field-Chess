@@ -7,7 +7,7 @@
 * this code will be modifed to field chess 
 */
 
-var gameimg = ['images/a1.gif', 'images/a2.gif', 'images/a3.gif', 'images/a4.gif', 'images/a5.gif', 'images/a6.gif', 'images/a7.gif', 'images/b1.gif', 'images/b2.gif', 'images/b3.gif', 'images/b4.gif', 'images/b5.gif', 'images/b6.gif', 'images/b7.gif', 'images/bg.gif', 'images/bg_over.gif', 'images/bg_sel.gif'];
+var gameimg = ['images/r1.gif', 'images/r2.gif', 'images/r3.gif', 'images/r4.gif', 'images/r5.gif', 'images/r6.gif', 'images/r7.gif', 'images/b1.gif', 'images/b2.gif', 'images/b3.gif', 'images/b4.gif', 'images/b5.gif', 'images/b6.gif', 'images/b7.gif', 'images/bg.gif', 'images/bg_over.gif', 'images/bg_sel.gif'];
 var chess_obj = new ChessClass();
 
 window.onload = function() {
@@ -20,7 +20,7 @@ window.onload = function() {
     img_preload(gameimg, callback);
 }
 
-// chess class
+// chess class constructure
 function ChessClass() { //in javascript, function is an object
     this.chess = [];
     this.boardrows = 4;
@@ -28,7 +28,7 @@ function ChessClass() { //in javascript, function is an object
     this.area = 82;
     this.player = 1; // 1:red 2:green
     this.selected = null; // selected chess
-    this.chesstype = ['', 'a', 'b']; //use this.player to indicate current player. if this.player==1, then current chesstype[1] is 'a'
+    this.chesstype = ['', 'r', 'b']; //use this.player to indicate current player. if this.player==1, then current chesstype[1] is 'r'
     this.isover = 0;
     this.firstMove = 1; //firstMove==1 means first player is not define yet. if firstMove==0, assign current player to this player.
 }
@@ -53,13 +53,18 @@ ChessClass.prototype.resetPlayer = function() {
 // create board and fill chess background
 ChessClass.prototype.create_board = function() {
     var board = '';
+    // for (var i = 0; i < this.boardrows; i++) {
+    //     for (var j = 0; j < this.boardcols; j++) {
+    //         if ((i == 1 || i == 2) && (j == 3 || j == 4)) {
+    //             board = board + '<div id="' + i + '_' + j + '"><img src="images/bg.gif" /></div>';
+    //         } else {
+    //             board = board + '<div id="' + i + '_' + j + '"><img src="images/chessbg.gif" /></div>';
+    //         }
+    //     }
+    // }
     for (var i = 0; i < this.boardrows; i++) {
         for (var j = 0; j < this.boardcols; j++) {
-            if ((i == 1 || i == 2) && (j == 3 || j == 4)) {
-                board = board + '<div id="' + i + '_' + j + '"><img src="images/bg.gif" /></div>';
-            } else {
-                board = board + '<div id="' + i + '_' + j + '"><img src="images/chessbg.gif" /></div>';
-            }
+            board = board + '<div id="' + i + '_' + j + '"><img src="" /></div>';
         }
     }
     $('board').innerHTML = board;
@@ -67,21 +72,34 @@ ChessClass.prototype.create_board = function() {
     $('board').style.height = this.boardrows * (this.area + 2) + 'px';
 }
 //flip all chess to show all 
-ChessClass.prototype.showAll = function() {
+ChessClass.prototype.showAll = function () {
     var chess = this.chess;
     for (var i = 0, max = chess.length; i < max; i++) {
-        if (i != 11 && i != 12 && i != 19 && i != 20) {
-            this.show(i);
-        }
+        //if (i != 11 && i != 12 && i != 19 && i != 20) {
+        
+            var index = i;
+            if(this.chess[index].status==-1){ //empty
+                $(this.getid(index)).innerHTML = '<img src="images/bg.gif" />';
+            }else{
+                $(this.getid(index)).innerHTML = '<img src="images/' + this.chess[index]['chess'] + '.gif" />';
+                this.chess[index]['status'] = 1;
+            }
+            
+            // opened
+            if (this.selected != null) {
+                // 清空選中
+                $(this.getid(this.selected.index)).className = '';
+                this.selected = null;
+            }
+        //}
 
     }
-
 }
 
 // create random chess
 ChessClass.prototype.create_chess = function() {
     // 32 chesses
-    var chesses = ['a1', 'a2', 'a2', 'a3', 'a3', 'a4', 'a4', 'a5', 'a5', 'a6', 'a6', 'a7', 'a7', 'a7', 'b1', 'b2', 'b2', 'b3', 'b3', 'b4', 'b5', 'b5', 'b5', 'b6', 'b6', 'b7', 'b7', 'b7'];
+    var chesses = ['r1', 'r2', 'r2', 'r3', 'r3', 'r4', 'r4', 'r5', 'r5', 'r6', 'r6', 'r7', 'r7', 'r7', 'b1', 'b2', 'b2', 'b3', 'b3', 'b4', 'b5', 'b5', 'b5', 'b6', 'b6', 'b7', 'b7', 'b7'];
     this.chess = [];
     while (chesses.length > 0) {
         var rnd = Math.floor(Math.random() * chesses.length);
@@ -91,7 +109,7 @@ ChessClass.prototype.create_chess = function() {
             'chess': tmpchess,
             'type': tmpchess.substr(0, 1),
             'val': tmpchess.substr(1, 1),
-            'status': 0
+            'status': 0 //status: 0:covered, 1:uncovered, -1: empty
         });
     }
     //insert empty chess
@@ -117,6 +135,7 @@ ChessClass.prototype.create_chess = function() {
         'val': '',
         'status': -1
     });
+    //console.log(this.chess);
 }
 
 // create event
@@ -176,7 +195,7 @@ ChessClass.prototype.onClick = function(o) {
         }
     } else {
         // 已选过棋子
-        if (index != this.selected['index']) {
+        if (index != this.selected.index) {
             // 與selected不是同一位置
             if (this.chess[index]['status'] == 0) {
                 // 未打开的棋子
@@ -225,7 +244,7 @@ ChessClass.prototype.select = function(index) {
         'chess': this.chess[index]
     };
     $(this.getid(index)).className = 'onsel';
-    this.player=this.chess[index]['type']=='a'? 1:2;
+    this.player=this.chess[index]['type']=='r'? 1:2;
 }
 //code here
 // move chess 只單純移動棋子，不吃子
@@ -244,12 +263,10 @@ ChessClass.prototype.move = function(index) {
 }
 // code here
 // kill chess 已點到敵方棋子，檢查是否可吃子
-ChessClass.prototype.kill = function(index) {
-    
-    
-    
-    if (this.isKillMovementLegal(index) == true && this.can_kill(index) == true) {
-        this.chess[index] = {
+ChessClass.prototype.kill = function(toIndex) {
+    //if (this.isKillLegal(index, this.selindex) == true && this.can_kill(index) == true) {
+    if (this.isKillLegal(this.selindex,toIndex) == true) {
+        this.chess[toIndex] = {
             'chess': this.selected['chess']['chess'],
             'type': this.selected['chess']['type'],
             'val': this.selected['chess']['val'],
@@ -258,7 +275,7 @@ ChessClass.prototype.kill = function(index) {
         this.remove(this.selected['index']);
         var killed = this.player == 1 ? 2 : 1;
         $('grade_num' + killed).innerHTML = parseInt($('grade_num' + killed).innerHTML) - 1;
-        this.show(index);
+        this.show(toIndex);
         this.firstMove=0;
     }
 }
@@ -296,70 +313,140 @@ ChessClass.prototype.isMovementLegal = function(index, selindex) {
     var toColumn = parseInt(to_info[1]);
     var rowVector = toRow-fromRow;
     var colVector= toColumn-fromColumn;
-    
-    switch(parseInt(this.chess[selindex]['val'])){
+
+    switch (parseInt(this.chess[selindex]['val'])) {
         case 1: //Generals
         case 2: //Advisor
         case 3: //Elephant
         case 4: //Chariot
-        case 5: //Horse
-            return this.checkHorseMovement(rowVector,colVector); 
-            break;
         case 6: //Cannon
         case 7: //Soldier
-    }
-    
-    if (fromRow == toRow && Math.abs(fromColumn - toColumn) == 1 || fromColumn == toColumn && Math.abs(fromRow - toRow) == 1) {
-        // row or colunm is same and interval=1
-        return true;
-    } else {
-        return false;
+            if ((Math.abs(rowVector)+Math.abs(colVector))==1) {
+                return true;
+            } else {
+                return false;
+            }
+            break;
+        case 5: //Horse
+            return this.checkHorseMovement(selindex, index);
+            break;
     }
 }
-ChessClass.prototype.isKillMovementLegal = function(index, selindex) {
-    if (typeof (selindex) == 'undefined') {
+ChessClass.prototype.isKillLegal = function(fromIndex, toIndex) {
+    if (typeof (fromIndex) == 'undefined') {
         if (this.selected != null) {
-            selindex = this.selected['index'];
+            fromIndex = this.selected['index'];
         } else {
             return false;
         }
     }
 
-    if (typeof (this.chess[index]) == 'undefined') {
+    if (typeof (this.chess[toIndex]) == 'undefined') {
         return false;
     }
     
-    var from_info = this.getid(selindex).split('_');
-    var to_info = this.getid(index).split('_');
-    var fromRow = parseInt(from_info[0]);
-    var fromColumn = parseInt(from_info[1]);
-    var toRow = parseInt(to_info[0]);
-    var toColumn = parseInt(to_info[1]);
-    var rowVector = toRow-fromRow;
-    var colVector= toColumn-fromColumn;
-    
-    switch(parseInt(this.chess[selindex]['val'])){
+    // var from_info = this.getid(fromIndex).split('_');
+    // var to_info = this.getid(toIndex).split('_');
+    // var fromRow = parseInt(from_info[0]);
+    // var fromColumn = parseInt(from_info[1]);
+    // var toRow = parseInt(to_info[0]);
+    // var toColumn = parseInt(to_info[1]);
+    // var rowVector = toRow-fromRow;
+    // var colVector= toColumn-fromColumn;
+    var fromIndexVal = parseInt(this.chess[fromIndex]['val']);
+    switch(fromIndexVal){
         case 1: //Generals
         case 2: //Advisor
         case 3: //Elephant
+        case 7: //Soldier
+            if (this.IsHorizontalVerticalMove(fromIndex, toIndex)==true && this.InterDistance(fromIndex, toIndex)==1) {
+                // row or colunm is same and interval=1
+                return this.normalKill(fromIndex, toIndex);
+            } else {
+                return false;
+            }
+            break;
         case 4: //Chariot
+            return this.checkChariotKillMovement(fromIndex,toIndex);
         case 5: //Horse
-            return this.checkHorseMovement(rowVector,colVector); 
+            return this.checkHorseMovement(fromIndex,toIndex); 
             break;
         case 6: //Cannon
-        case 7: //Soldier
+            return this.checkCannonKillMovement(fromIndex, toIndex); 
+            break;
     }
+    return false;
+
+}
+ChessClass.prototype.checkCannonKillMovement=function(fromIndex,toIndex){
+    if(this.IsHorizontalVerticalMove(fromIndex, toIndex)==false) return false;
+    if(this.InterCount(fromIndex, toIndex)==1){ //there is only one chess between these two chesses
+        return true; //can kill anyway
+    }
+    return false;
+}
+
+ChessClass.prototype.checkChariotKillMovement=function(fromIndex,toIndex){
+    if(this.IsHorizontalVerticalMove(fromIndex, toIndex)==false) return false;
+    //check inter distance
+    if(this.InterDistance(fromIndex, toIndex)==1){
+        return this.normalKill(fromIndex, toIndex);//NormalKill
+    }
+    if(this.InterCount(fromIndex, toIndex)==0){ //there is no other chesses between these two chess
+        return true; //can kill anyway
+    }
+    return false;
     
-    if (fromRow == toRow && Math.abs(fromColumn - toColumn) == 1 || fromColumn == toColumn && Math.abs(fromRow - toRow) == 1) {
-        // row or colunm is same and interval=1
-        return true;
-    } else {
+
+}
+ChessClass.prototype.InterCount=function(fromIndex,toIndex){
+    var fromRowCol = this.getRowCol(fromIndex);
+    var toRowCol = this.getRowCol(toIndex);
+    var increment;
+    var result = 0;
+    var currentIndex = fromIndex;
+
+    //search from column
+    var hDiff = toRowCol[1] - fromRowCol[1];
+    if (hDiff != 0) {
+        increment = hDiff / Math.abs(hDiff);
+        while (this.getRowCol(currentIndex)[1] != this.getRowCol(toIndex)[1]) {
+            currentIndex += increment;
+            if (this.chess[currentIndex].status == 1) {
+                result++;
+            }
+        }
+    }
+    //then search from row
+    var vDiff = toRowCol[0] - fromRowCol[0];
+    if (vDiff != 0) {
+        increment = vDiff / Math.abs(vDiff);
+        while (this.getRowCol(currentIndex)[0] != this.getRowCol(toIndex)[0]) {
+            currentIndex += increment * this.boardcols;
+            if (this.chess[currentIndex].status == 1) {
+                result++;
+            }
+        }
+    }
+    return result-1;
+}
+ChessClass.prototype.InterDistance=function(fromIndex,toIndex){
+    var fromRowCol = this.getRowCol(fromIndex);
+    var toRowCol = this.getRowCol(toIndex);
+    return Math.abs(fromRowCol[0] - toRowCol[0]) + Math.abs(fromRowCol[1] - toRowCol[1])
+}
+ChessClass.prototype.IsHorizontalVerticalMove=function(fromIndex,toIndex){
+    var fromRowCol = this.getRowCol(fromIndex);
+    var toRowCol = this.getRowCol(toIndex);
+    if ((fromRowCol[0] - toRowCol[0]) != 0 && (fromRowCol[1] - toRowCol[1]) != 0) {
         return false;
     }
+    return true;
 }
-ChessClass.prototype.checkHorseMovement=function(rowVector, colVector){
-    if(Math.abs(rowVector)==1 && Math.abs(colVector)==1) return true;
-    else return false;
+ChessClass.prototype.checkHorseMovement=function(fromIndex, toIndex){
+    if(this.InterDistance(fromIndex,toIndex)!=2){return false;}
+    if(this.IsHorizontalVerticalMove(fromIndex,toIndex)==true){return false;}
+    return true;
 }
 
 /* check can kill
@@ -377,31 +464,31 @@ ChessClass.prototype.can_kill = function(index, selindex) {
             return false;
         }
     }
-
-    //todo check the type of chess
-    switch (parseInt(this.chess[selindex]['val'])) {
-        case 1: //Generals
-        case 2: //Advisor
-        case 3: //Elephant
-        case 4: //Chariot
-        case 5: //Horse
-
-            break;
-        case 6: //Cannon
-        case 7: //Soldier
-    }
-    
-    
-    if (this.chess[index]['type'] != this.chesstype[this.player]) {
-        if (parseInt(this.chess[selindex]['val']) == 7 && parseInt(this.chess[index]['val']) == 1) {
-            // 7 can kill 1
-            return true;
-        } else if (parseInt(this.chess[selindex]['val']) == 1 && parseInt(this.chess[index]['val']) == 7) {
-            // 1 can't kill 7
-            return false;
-        } else if (parseInt(this.chess[selindex]['val']) <= parseInt(this.chess[index]['val'])) {
-            // small kill big
-            return true;
+    return this.normalKill(index, selindex);
+}
+ChessClass.prototype.normalKill = function(fromIndex,toIndex) {
+    if (this.chess[toIndex]['type'] != this.chesstype[this.player]) {
+        var fromChessVal = parseInt(this.chess[fromIndex]['val']);
+        var toChessVal = parseInt(this.chess[toIndex]['val']);
+        switch(fromChessVal){
+            case 1: //Generals
+                if(toChessVal==7){return false;}
+                return true;
+                break;
+            case 2: //Advisor
+            case 3: //Elephant
+            case 4: //Chariot
+                if(fromChessVal<=toChessVal){return true;}
+                return false;
+                break;
+            case 5: //Horse
+            case 6: //Cannon
+                return false;
+                break;
+            case 7: //Soldier
+                if(toChessVal==1){return true;}
+                return false;
+                break;
         }
     }
     return false;
@@ -426,7 +513,7 @@ ChessClass.prototype.change_player = function() {
 ChessClass.prototype.reset_grade = function() {
     $('grade_img1').className = 'img_on';
     $('grade_img2').className = 'img';
-    $('grade_num1').innerHTML = $('grade_num2').innerHTML = 16;
+    $('grade_num1').innerHTML = $('grade_num2').innerHTML = 14;
     $('grade_res1').className = $('grade_res2').className = 'none';
     $('grade_res1').innerHTML = $('grade_res2').innerHTML = '';
 }
@@ -500,6 +587,9 @@ ChessClass.prototype.isAnyChessCanAction = function() {
         }
     }
     return false;
+}
+ChessClass.prototype.getRowCol = function(index) {
+    return this.getid(index).split('_');
 }
 
 /** common function */
