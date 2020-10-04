@@ -486,7 +486,7 @@ ChessClass.prototype.normalKill = function(fromIndex,toIndex) {
                 return false;
                 break;
             case 7: //Soldier
-                if(toChessVal==1){return true;}
+                if(toChessVal==1 || toChessVal==7){return true;}
                 return false;
                 break;
         }
