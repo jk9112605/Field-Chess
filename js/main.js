@@ -99,7 +99,8 @@ ChessClass.prototype.showAll = function () {
 // create random chess
 ChessClass.prototype.create_chess = function() {
     // 32 chesses
-    var chesses = ['r1', 'r2', 'r2', 'r3', 'r3', 'r4', 'r4', 'r5', 'r5', 'r6', 'r6', 'r7', 'r7', 'r7', 'b1', 'b2', 'b2', 'b3', 'b3', 'b4', 'b5', 'b5', 'b5', 'b6', 'b6', 'b7', 'b7', 'b7'];
+    var chesses = ['r1', 'r2', 'r2', 'r3', 'r3', 'r4', 'r4', 'r5', 'r5', 'r6', 'r6', 'r7', 'r7', 'r7', 
+                   'b1', 'b2', 'b2', 'b3', 'b3', 'b4', 'b4', 'b5', 'b5', 'b6', 'b6', 'b7', 'b7', 'b7'];
     this.chess = [];
     while (chesses.length > 0) {
         var rnd = Math.floor(Math.random() * chesses.length);
