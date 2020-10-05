@@ -246,7 +246,7 @@ ChessClass.prototype.select = function(index) {
     $(this.getid(index)).className = 'onsel';
     this.player=this.chess[index]['type']=='r'? 1:2;
 }
-//code here
+
 // move chess 只單純移動棋子，不吃子
 ChessClass.prototype.move = function(index) {
     if (this.isMovementLegal(index)) {
@@ -261,7 +261,7 @@ ChessClass.prototype.move = function(index) {
         this.firstMove=0; //remove firstMove
     }
 }
-// code here
+
 // kill chess 已點到敵方棋子，檢查是否可吃子
 ChessClass.prototype.kill = function(toIndex) {
     //if (this.isKillLegal(index, this.selindex) == true && this.can_kill(index) == true) {
@@ -556,9 +556,10 @@ ChessClass.prototype.show_grade = function() {
         $('grade_res1').className = $('grade_res2').className = 'draw';
     }
 }
-
+//todo code here, need to modify
 // check chess can action
 ChessClass.prototype.isAnyChessCanAction = function() {
+    return true; //need to modify
     var chess = this.chess;
     for (var i = 0, max = chess.length; i < max; i++) {
         if (chess[i].status == 0) {
