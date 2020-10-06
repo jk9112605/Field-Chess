@@ -13,8 +13,17 @@ body{margin:0px auto; text-align:center; background:#D2B69A;}
 .footer .loss{color:#003B00; font-weight:bold; font-family:"Arial"; margin:0px;}
 .footer .draw{color:#0066CC; font-weight:bold; font-family:"Arial"; margin:0px;}
 .footer .none{display:none;}
-.tips{text-align:center;}
-.tips textarea{width:650px; height:150px; line-height:150%; border:2px solid #3A2A16; padding:5px; background:#dcc2a4;}
+.tips{
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 10px;
+    border:2px solid #3A2A16;
+    padding-right :20px; 
+    background:#dcc2a4;
+    text-align:left;
+    width: 650px
+}
+/* .tips textarea{width:650px; height:150px; line-height:150%; border:2px solid #3A2A16; padding:5px; background:#dcc2a4;} */
 #init_div{display:none; margin:20px;}
 .clear{clear:both;}
 #board{border:3px solid #3A2A16; text-align:center; margin:0px auto;}
