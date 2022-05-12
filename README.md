@@ -8,4 +8,3 @@ Hope someone could tranlate this wiki page to English.
 ## Steps to implement
 1. Study the suitable platform to build field-chess. Currently, it seems javascript and html5 is a good solution.
 2. But how to run the program on website?
-3. 
